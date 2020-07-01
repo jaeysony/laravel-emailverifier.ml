@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use App\Contact;
 
+// import VerificationResult
+use App\Http\Resources\VerificationResult as VerificationResultResource;
+
 class HomeController extends Controller
 {
 
@@ -21,10 +24,18 @@ class HomeController extends Controller
     {
       $email = 'hello@jaeyson.ml';
 
-      return Http::get(env('MYEMAILVERIFIER_ENDPOINT', ''), [
-          'email' => $email,
-          'apikey' => env('MYEMAILVERIFIER_APIKEY', '')
-      ])->json();
+      $verifiyResult = Http::get(env('MYEMAILVERIFIER_ENDPOINT', ''), ['email' => $email,'apikey' => env('MYEMAILVERIFIER_APIKEY', '')]);
+      $resourceResult = [
+        'emailAddress' => $verifiyResult['data']['Address'],
+        'status' => $verifiyResult['data']['Status'],
+      ];
+      // return $verifiyResult;
+      return new VerificationResultResource($resourceResult);
+
+      // return Http::get(env('MYEMAILVERIFIER_ENDPOINT', ''), [
+      //     'email' => $email,
+      //     'apikey' => env('MYEMAILVERIFIER_APIKEY', '')
+      // ])->json();
       // Log::info('jsondata', $response);
     }
 
